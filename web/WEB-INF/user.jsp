@@ -72,7 +72,7 @@
                                     <select name="roleName" class="form-control bg-dark text-white">
                                         <c:forEach items="${roles}" var="role">
                                             <%-- when the role ID found then the opstion is default selected--%>
-                                            <option value=${role.roleID} ${role.roleID == userToEdit.roleID ? 'selected="selected"' : ''}>${role.roleName}</option> 
+                                            <option value=${role.roleId} ${role.roleId == userToEdit.roleId.roleId ? 'selected="selected"' : ''}>${role.roleName}</option> 
                                         </c:forEach>                        
                                     </select>   
                                     <br>
@@ -153,11 +153,7 @@
                                     </td>
                                     <td>${user.firstName}</td>
                                     <td>${user.lastName}</td>
-                                    <c:forEach items="${roles}" var="role"> <%-- loop to find role name with role id --%>
-                                        <c:if test="${role.roleID == user.roleID}">
-                                            <td>${role.roleName}</td>
-                                        </c:if>
-                                    </c:forEach>
+                                    <td>${user.roleId.roleName}</td> <%-- JPA magic happening here! --%>
                                     <td>
                                         <form action="User" method="post">
                                             <input type="submit" value="Edit" class="btn btn-warning">

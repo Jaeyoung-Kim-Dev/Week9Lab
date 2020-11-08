@@ -111,11 +111,6 @@ public class UserServlet extends HttpServlet {
             // it passes the email address for SQL query
             case "deleteUser":
                 try {
-                    Note note = new Note();
-                    note.setNoteId(noteId);
-                    NoteDB noteDB = new NoteDB();
-                    noteDB.delete(note);                    
-                    
                     String email = request.getParameter("key");
                     User user = new User(email);
                     userService.delete(user);
@@ -131,14 +126,15 @@ public class UserServlet extends HttpServlet {
                 String firstName = request.getParameter("firstName");
                 String lastName = request.getParameter("lastName");
                 String password = request.getParameter("password");
-                int role = Integer.parseInt(request.getParameter("roleName"));
+                int roleId = Integer.parseInt(request.getParameter("roleName"));
 
                 if (email == null || email.equals("")) {
                     session.setAttribute("pageStatus", "display");
                     break;
                 }
 
-                User user = new User(email, isActive, firstName, lastName, password, role);
+                User user = new User(email, isActive, firstName, lastName, password);
+                user.setRoleId(new Role(roleId));
 
                 String pageStatus = (String) session.getAttribute("pageStatus"); // verify if adding a new user or editing the existing user
                 try {
