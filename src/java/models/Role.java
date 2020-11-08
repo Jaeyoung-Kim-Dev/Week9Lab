@@ -1,63 +1,109 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package models;
 
 import java.io.Serializable;
+import java.util.List;
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
- * This class is a javabean
- * It has a default constructor, user-defined constructor and getters and setter's for all fields
+ *
+ * @author kornk
  */
+@Entity
+@Table(name = "role")
+@XmlRootElement
+@NamedQueries({
+    @NamedQuery(name = "Role.findAll", query = "SELECT r FROM Role r")
+    , @NamedQuery(name = "Role.findByRoleId", query = "SELECT r FROM Role r WHERE r.roleId = :roleId")
+    , @NamedQuery(name = "Role.findByRoleName", query = "SELECT r FROM Role r WHERE r.roleName = :roleName")})
 public class Role implements Serializable {
-    
-    private int roleID;
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @Basic(optional = false)
+    @Column(name = "role_id")
+    private Integer roleId;
+    @Basic(optional = false)
+    @Column(name = "role_name")
     private String roleName;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "roleId", fetch = FetchType.EAGER)
+    private List<User> userList;
 
-    /**
-     * Defined default constructor for Role Java-Bean
-     */
-    public Role() {}
+    public Role() {
+    }
 
-    /**
-     * User-Defined constructor for Role Java-Bean
-     * 
-     * @param roleID the ID of the role
-     * @param roleName the String name of the role
-     */
-    public Role(int roleID, String roleName) {
-        this.roleID = roleID;
+    public Role(Integer roleId) {
+        this.roleId = roleId;
+    }
+
+    public Role(Integer roleId, String roleName) {
+        this.roleId = roleId;
         this.roleName = roleName;
     }
 
-    /**
-     * Role ID getter method
-     * @return the roles ID
-     */
-    public int getRoleID() {
-        return roleID;
+    public Integer getRoleId() {
+        return roleId;
     }
 
-    /**
-     * Role ID setter method
-     * @param roleID the new value for the roles ID
-     */
-    public void setRoleID(int roleID) {
-        this.roleID = roleID;
+    public void setRoleId(Integer roleId) {
+        this.roleId = roleId;
     }
 
-    /**
-     * Role name getter method
-     * @return the String value of the role
-     */
     public String getRoleName() {
         return roleName;
     }
 
-    /**
-     * Role name setter method
-     * @param roleName the new String value for the roles name
-     */
     public void setRoleName(String roleName) {
         this.roleName = roleName;
     }
-    
+
+    @XmlTransient
+    public List<User> getUserList() {
+        return userList;
+    }
+
+    public void setUserList(List<User> userList) {
+        this.userList = userList;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (roleId != null ? roleId.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof Role)) {
+            return false;
+        }
+        Role other = (Role) object;
+        if ((this.roleId == null && other.roleId != null) || (this.roleId != null && !this.roleId.equals(other.roleId))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "models.Role[ roleId=" + roleId + " ]";
+    }
     
 }

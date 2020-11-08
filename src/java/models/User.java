@@ -1,136 +1,146 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package models;
 
 import java.io.Serializable;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
 
-/*
-    This class is javabean
-    It has a default constructor, user-defined constructor and getters and setter's for all fields
+/**
+ *
+ * @author kornk
  */
-public class User implements Serializable{
+@Entity
+@Table(name = "user")
+@XmlRootElement
+@NamedQueries({
+    @NamedQuery(name = "User.findAll", query = "SELECT u FROM User u")
+    , @NamedQuery(name = "User.findByEmail", query = "SELECT u FROM User u WHERE u.email = :email")
+    , @NamedQuery(name = "User.findByActive", query = "SELECT u FROM User u WHERE u.active = :active")
+    , @NamedQuery(name = "User.findByFirstName", query = "SELECT u FROM User u WHERE u.firstName = :firstName")
+    , @NamedQuery(name = "User.findByLastName", query = "SELECT u FROM User u WHERE u.lastName = :lastName")
+    , @NamedQuery(name = "User.findByPassword", query = "SELECT u FROM User u WHERE u.password = :password")})
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @Basic(optional = false)
+    @Column(name = "email")
     private String email;
+    @Basic(optional = false)
+    @Column(name = "active")
     private boolean active;
+    @Basic(optional = false)
+    @Column(name = "first_name")
     private String firstName;
+    @Basic(optional = false)
+    @Column(name = "last_name")
     private String lastName;
+    @Basic(optional = false)
+    @Column(name = "password")
     private String password;
-    private int roleID;
+    @JoinColumn(name = "role_id", referencedColumnName = "role_id")
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    private Role roleId;
 
-    /**
-     * Defined default constructor for User Java-Bean
-     */
-    public User() {}
+    public User() {
+    }
 
-    /**
-     * User-Defined constructor for User Java-Bean
-     * 
-     * @param email the email of the user
-     * @param active boolean value for if the user is active 
-     * @param firstName the first name of the user
-     * @param lastName the last name of the user
-     * @param password the password of the user
-     * @param role the integer value of the users roleID
-     */
-    public User(String email, boolean active, String firstName, String lastName, String password, int role) {
+    public User(String email) {
+        this.email = email;
+    }
+
+    public User(String email, boolean active, String firstName, String lastName, String password) {
         this.email = email;
         this.active = active;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
-        this.roleID = role;
     }
 
-    /**
-     * User email getter method
-     * @return users email
-     */
     public String getEmail() {
         return email;
     }
 
-    /**
-     * User email setter method
-     * @param email the new value for email
-     */
     public void setEmail(String email) {
         this.email = email;
     }
 
-    /**
-     * Getter for if the user is active
-     * @return if the user is active
-     */
-    public boolean isActive() {
+    public boolean getActive() {
         return active;
     }
 
-    /**
-     * Setter method for if user is active
-     * @param active the new boolean value for if the user is active
-     */
     public void setActive(boolean active) {
         this.active = active;
     }
 
-    /**
-     * User first name getter method
-     * @return the first name of the user
-     */
     public String getFirstName() {
         return firstName;
     }
 
-    /**
-     * User first name setter method
-     * @param firstName the new value for the users first name
-     */
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
-    /**
-     * User last name getter method
-     * @return the last name of the user
-     */
     public String getLastName() {
         return lastName;
     }
 
-    /**
-     * User last name setter method
-     * @param lastName the new value for the users last name
-     */
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
-    /**
-     * User password getter method
-     * @return the users password
-     */
     public String getPassword() {
         return password;
     }
 
-    /**
-     * User password setter method
-     * @param password the new value for the users password
-     */
     public void setPassword(String password) {
         this.password = password;
     }
 
-    /**
-     * User roleID getter method
-     * @return the roleID of the user represented by the integer value
-     */
-    public int getRoleID() {
-        return roleID;
+    public Role getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Role roleId) {
+        this.roleId = roleId;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (email != null ? email.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof User)) {
+            return false;
+        }
+        User other = (User) object;
+        if ((this.email == null && other.email != null) || (this.email != null && !this.email.equals(other.email))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "models.User[ email=" + email + " ]";
     }
     
-    /**
-     * User roleID setter method
-     * @param roleID the new integer value for the users roleID
-     */
-    public void setRoleID(int roleID) {
-        this.roleID = roleID;
-    }
 }
