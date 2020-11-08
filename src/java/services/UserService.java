@@ -57,8 +57,8 @@ public class UserService {
      * @param email the email of the user to be deleted
      * @throws Exception if there is a Exception with PreparedStatements and ResultSets
      */
-    public void delete(String email) throws Exception {        
+    public void delete(User user) throws Exception {        
         UserDB userDB = new UserDB();
-        userDB.delete(email);
+        userDB.delete(user);
     }
 }
