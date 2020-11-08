@@ -51,12 +51,14 @@
                                     <br>
                                     <div class="form-check form-check-inline">                               
                                         <div class="alert badge-success p-2 m-0">
+                                            <%-- backslashes' required for the radio onlick events --%>
                                             <input class="form-check-input " type="radio" name="isActive" id="activeRadio" onclick = \"getAnswer('active') value="active" ${userToEdit.email == null || userToEdit.active ? 'checked': ''}>
                                             <label class="form-check-label" for="activeRadio">Active</label>
                                         </div>
                                     </div>
                                     <div class="form-check form-check-inline">
                                         <div class="alert badge-danger p-2 m-0">
+                                            <%-- backslashes' required for the radio onlick events --%>
                                             <input class="form-check-input" type="radio" name="isActive" id="inactiveRadio" onclick = \"getAnswer('active') value="inactive" ${userToEdit.email != null && !userToEdit.active ? 'checked':''}>
                                             <label class="form-check-label" for="inactiveRadio">Inactive</label>
                                         </div>
