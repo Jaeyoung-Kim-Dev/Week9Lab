@@ -45,13 +45,13 @@
                                             <input type="email" name="email" placeholder="Email" class="form-control bg-dark text-white">
                                         </c:when>
                                         <c:when test="${editUser== true}">
-                                            <input type="email" name="email" placeholder="Email" class="form-control bg-dark text-white" value=${userToEdit.email} readonly>
+                                            <input type="email" name="email" placeholder="Email" class="form-control bg-dark text-white" value="${userToEdit.email}" readonly>
                                         </c:when>        
                                     </c:choose>
                                     <br>
                                     <div class="form-check form-check-inline">                               
                                         <div class="alert badge-success p-2 m-0">
-                                            <input class="form-check-input " type="radio" name="isActive" id="activeRadio" onclick = \"getAnswer('active') value='active' ${userToEdit.email == null || userToEdit.active ? 'checked': ''}>
+                                            <input class="form-check-input " type="radio" name="isActive" id="activeRadio" onclick = \"getAnswer('active') value="active" ${userToEdit.email == null || userToEdit.active ? 'checked': ''}>
                                             <label class="form-check-label" for="activeRadio">Active</label>
                                         </div>
                                     </div>
@@ -63,16 +63,16 @@
                                     </div>
                                     <br>
                                     <br>
-                                    <input type="text" name="firstName" placeholder="First Name" class="form-control bg-dark text-white" value=${userToEdit.firstName}>
+                                    <input type="text" name="firstName" placeholder="First Name" class="form-control bg-dark text-white" value="${userToEdit.firstName}">
                                     <br>
-                                    <input type="text" name="lastName" placeholder="Last Name" class="form-control bg-dark text-white" value=${userToEdit.lastName}>
+                                    <input type="text" name="lastName" placeholder="Last Name" class="form-control bg-dark text-white" value="${userToEdit.lastName}">
                                     <br>
-                                    <input type="password" name="password" placeholder="Password" class="form-control bg-dark text-white" value=${userToEdit.password} >
+                                    <input type="password" name="password" placeholder="Password" class="form-control bg-dark text-white" value="${userToEdit.password}">
                                     <br>                                    
                                     <select name="roleName" class="form-control bg-dark text-white">
                                         <c:forEach items="${roles}" var="role">
                                             <%-- when the role ID found then the opstion is default selected--%>
-                                            <option value=${role.roleId} ${role.roleId == userToEdit.roleId.roleId ? 'selected="selected"' : ''}>${role.roleName}</option> 
+                                            <option value="${role.roleId}" ${role.roleId == userToEdit.roleId.roleId ? 'selected="selected"' : ''}>${role.roleName}</option> 
                                         </c:forEach>                        
                                     </select>   
                                     <br>
@@ -158,7 +158,7 @@
                                         <form action="User" method="post">
                                             <input type="submit" value="Edit" class="btn btn-warning">
                                             <input type="hidden" name="action" value="editUser">
-                                            <input type="hidden" name="key" value=${user.email}>
+                                            <input type="hidden" name="key" value="${user.email}">
                                         </form>
                                         <br>            
                                     </td>
@@ -167,7 +167,7 @@
                                         <form action="User" method="post">
                                             <input type="submit" value="Delete"class="btn btn-danger">
                                             <input type="hidden" name="action" value="deleteUser">                        
-                                            <input type="hidden" name="key" value=${user.email}>
+                                            <input type="hidden" name="key" value="${user.email}">
                                             <br>            
                                         </form>
                                     </td>
