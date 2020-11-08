@@ -111,9 +111,8 @@ public class UserServlet extends HttpServlet {
             // it passes the email address for SQL query
             case "deleteUser":
                 try {
-                    String email = request.getParameter("key");
-                    User user = new User(email);
-                    userService.delete(user);
+                    String key = request.getParameter("key");
+                    userService.delete(key);
                     session.setAttribute("pageStatus", "display");
                 } catch (Exception ex) {
                     Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
