@@ -8,14 +8,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import models.Role;
 import models.User;
 import services.RoleService;
 import services.UserService;
 
 /*
-    doGet: get session and display user.jsp
+    doGet: get "action" parameter and display user.jsp
     doPost: get "action" parameter and add, edit, delete, save cancel using case statement
  */
 /**
@@ -24,55 +23,40 @@ import services.UserService;
 public class UserServlet extends HttpServlet {
 
     /**
-     * Gets the session and displays the user.jsp based on status Populates List
-     * for users
+     * Gets the "action" and displays the user.jsp based on status Populates
+     * List for users
+     *
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         UserService userService = new UserService();
-        RoleService roleService = new RoleService();
-
-        HttpSession session = request.getSession();
-
-        String pageStatus = (String) session.getAttribute("pageStatus");
-
-        // when page status session is null then display the default page.
-        if (pageStatus == null) {
-            session.setAttribute("pageStatus", "display");
-            response.sendRedirect("User");
-            return;
-        }
 
         // change user form in 'user.jsp' as per the the diplay mode such as default, add or edit user
-        switch (pageStatus) {
-            case "display": // default display. also used after save, delete user or cancel.
-                request.setAttribute("defaultTitle", true);
-                request.setAttribute("enableForm", false);
-                request.setAttribute("cancelForm", false);
-                break;
-            case "addUser": // add user display mode
-                request.setAttribute("addUser", true);
-                request.setAttribute("enableForm", true);
-                request.setAttribute("cancelForm", true);
-                break;
-            case "editUser": // edit user display mode
-                request.setAttribute("editUser", true);
-                request.setAttribute("enableForm", true);
-                request.setAttribute("cancelForm", true);
-                break;
-        }
+        String action = request.getParameter("action");
 
-        // pass users and roles to user.jsp
-        try {
-            List<User> users = userService.getAll();
-            List<Role> roles = roleService.getAll();
-            request.setAttribute("users", users);
-            request.setAttribute("roles", roles);
-        } catch (Exception ex) {
-            Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
+        if (null == action || "cancel".equals(action)) { // default display or when the press the "Cancel" button of the user form
+            defaultDisplay(request);
+        } else {
+            request.setAttribute("enableForm", true);
+            request.setAttribute("cancelForm", true);
+            switch (action) {
+                case "addUser": // when the press the "Add User" button of the user form                
+                    request.setAttribute("addUser", true);
+                    break;
+                case "editUser": // when the press the "Edit" button of the user in the table                
+                    try {
+                        String email = request.getParameter("email");
+                        User user = userService.get(email);
+                        request.setAttribute("userToEdit", user);
+                        request.setAttribute("editUser", true);
+                    } catch (Exception ex) {
+                        Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    break;
+            }
         }
-
+        setLists(request, userService);
         getServletContext().getRequestDispatcher("/WEB-INF/user.jsp").forward(request, response);
     }
 
@@ -84,38 +68,21 @@ public class UserServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
         UserService userService = new UserService();
         String action = request.getParameter("action");
 
         switch (action) {
-            // when the press the "Add User" button of the user form
-            case "addUser":
-                session.setAttribute("userToEdit", null); // make null for the userToEdit not to display in the user form
-                session.setAttribute("pageStatus", "addUser");
-                break;
-            // when the press the "Edit" button of the user in the table
-            // it passes the email address for SQL query                
-            case "editUser": {
-                try {
-                    String key = request.getParameter("key");
-                    User user = userService.get(key);
-                    session.setAttribute("userToEdit", user);
-                    session.setAttribute("pageStatus", "editUser");
-                } catch (Exception ex) {
-                    Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                break;
-            }
             // when the press the "Delete" button of the user in the table
             // it passes the email address for SQL query
             case "deleteUser":
                 try {
-                    String key = request.getParameter("key");
-                    userService.delete(key);
-                    session.setAttribute("pageStatus", "display");
+                    String email = request.getParameter("email");
+                    userService.delete(email);
+                    request.setAttribute("deleteMsg", true);
+                    request.setAttribute("emailDeleted", email);
                 } catch (Exception ex) {
-                    Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(UserServlet.class
+                            .getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
             // when the press the "Save" button of the user form
@@ -127,31 +94,60 @@ public class UserServlet extends HttpServlet {
                 String password = request.getParameter("password");
                 int roleId = Integer.parseInt(request.getParameter("roleName"));
 
-                if (email == null || email.equals("")) {
-                    session.setAttribute("pageStatus", "display");
+                if (email == null || email.equals("")) { // email is mandatory to add a new user
+                    request.setAttribute("invalidUser", true);
                     break;
                 }
 
                 User user = new User(email, isActive, firstName, lastName, password);
                 user.setRoleId(new Role(roleId));
 
-                String pageStatus = (String) session.getAttribute("pageStatus"); // verify if adding a new user or editing the existing user
+                String saveMode = request.getParameter("saveMode");
                 try {
-                    if ("addUser".equals(pageStatus)) { // adding a new user
+                    if ("addUser".equals(saveMode)) { // adding a new user
                         userService.insert(user);
-                    } else if ("editUser".equals(pageStatus)) { // editing the existing user
+                        request.setAttribute("addMsg", true);
+                        request.setAttribute("emailAdded", user.getEmail());
+                    } else if ("editUser".equals(saveMode)) { // editing the existing user
                         userService.update(user);
+                        request.setAttribute("editMsg", true);
+                        request.setAttribute("emailedited", user.getEmail());
                     }
                 } catch (Exception ex) {
-                    Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(UserServlet.class
+                            .getName()).log(Level.SEVERE, null, ex);
                 }
-                session.setAttribute("pageStatus", "display");
-                break;
-            // when the press the "Cancel" button of the user form
-            case "cancel":
-                session.setAttribute("pageStatus", "display");
                 break;
         }
-        response.sendRedirect("User");
+        defaultDisplay(request);
+        setLists(request, userService);
+        getServletContext().getRequestDispatcher("/WEB-INF/user.jsp").forward(request, response);
+    }
+
+    /**
+     * Initial display and when pressed the cancel button.
+     */
+    private HttpServletRequest defaultDisplay(HttpServletRequest request) {
+        request.setAttribute("defaultTitle", true);
+        request.setAttribute("enableForm", false);
+        request.setAttribute("cancelForm", false);
+        return request;
+    }
+
+    /**
+     * Pass users and roles to user.jsp
+     */
+    private HttpServletRequest setLists(HttpServletRequest request, UserService userService) {
+        try {
+            RoleService roleService = new RoleService();
+            List<User> users = userService.getAll();
+            List<Role> roles = roleService.getAll();
+            request.setAttribute("users", users);
+            request.setAttribute("roles", roles);
+        } catch (Exception ex) {
+            Logger.getLogger(UserServlet.class
+                    .getName()).log(Level.SEVERE, null, ex);
+        }
+        return request;
     }
 }
